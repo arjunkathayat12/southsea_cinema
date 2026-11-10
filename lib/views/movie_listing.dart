@@ -34,8 +34,7 @@ class _MovieListingState extends State<MovieListing> {
           elevation: 0,
         ),
         drawer: const NavDrawer(),
-        body: Container(
-            child: Column(
+        body: Column(
           children: [
             Text(
               'The Avengers (2012)',
@@ -132,6 +131,6 @@ class _MovieListingState extends State<MovieListing> {
                     color: Colors.white,
                   ))
           ],
-        )));
+        ));
   }
 }
