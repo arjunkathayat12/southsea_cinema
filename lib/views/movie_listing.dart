@@ -27,110 +27,119 @@ class _MovieListingState extends State<MovieListing> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(appTitle, style: cinemaHeaderStyle),
-          backgroundColor: cinemaSurface,
-          iconTheme: const IconThemeData(color: cinemaBrand),
-          elevation: 0,
-        ),
-        drawer: const NavDrawer(),
-        body: Column(
-          children: [
-            Text(
-              'The Avengers (2012)',
-              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+      appBar: AppBar(
+        title: const Text(appTitle),
+      ),
+      drawer: const NavDrawer(),
+      body: Column(
+        children: [
+          Text(
+            'The Avengers (2012)',
+            style: const TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
             ),
-            Text(
-              'S.H.I.E.L.D. leader Nick Fury is compelled to launch the Avengers programme when Loki poses a threat to planet Earth. But the superheroes must learn to work together if they are to stop him in time.',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            'S.H.I.E.L.D. leader Nick Fury is compelled to launch the Avengers programme when Loki poses a threat to planet Earth. But the superheroes must learn to work together if they are to stop him in time.',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 24),
-            const Text(
-              'Runtime: 143 minutes |  Age Rating: 12A',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Runtime: 143 minutes | Age Rating: 12A',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white70,
             ),
-            const SizedBox(height: 16),
-            const Text(
-              "Thursday 22 October 2026, 18:00",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            "Thursday 22 October 2026, 18:00",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white70,
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Southsea Cinema Room',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Southsea Cinema Room',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white70,
             ),
-            const SizedBox(height: 32),
-            const Text(
-              'Tickets',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+          ),
+          const SizedBox(height: 32),
+          const Text(
+            'Tickets',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                DropdownMenu<int>(
-                  initialSelection: 0,
-                  onSelected: (int? value) {
-                    setState(() {
-                      _ticketQuantity = value ?? 0;
-                      _orderMessage = '';
-                    });
-                  },
-                  dropdownMenuEntries: List.generate(
-                    6,
-                    (index) => DropdownMenuEntry<int>(
-                      value: index,
-                      label: '$index',
-                    ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              DropdownMenu<int>(
+                initialSelection: 0,
+                onSelected: (int? value) {
+                  setState(() {
+                    _ticketQuantity = value ?? 0;
+                    _orderMessage = '';
+                  });
+                },
+                dropdownMenuEntries: List.generate(
+                  6,
+                  (index) => DropdownMenuEntry<int>(
+                    value: index,
+                    label: '$index',
                   ),
                 ),
-                const SizedBox(width: 16),
-                const Expanded(
-                    child: Text('Adult (£7.50)',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                        )))
-              ],
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Text(
+                  'Adult (£7.50)',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Total: £${(_ticketQuantity * _ticketPrice).toStringAsFixed(2)}',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
-            const SizedBox(height: 24),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: _increaseQuantity,
+            child: const Text('Add To Order'),
+          ),
+          const SizedBox(height: 16),
+          if (_orderMessage.isNotEmpty)
             Text(
-              'Total: £${(_ticketQuantity * _ticketPrice).toStringAsFixed(2)}',
+              _orderMessage,
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: _increaseQuantity,
-              child: const Text('Add To Order'),
-            ),
-            const SizedBox(height: 16),
-            if (_orderMessage.isNotEmpty)
-              Text(_orderMessage,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ))
-          ],
-        ));
+        ],
+      ),
+    );
   }
 }
