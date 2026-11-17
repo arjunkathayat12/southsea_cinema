@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:southsea_cinema/constants.dart';
 import 'package:southsea_cinema/widgets/nav_drawer.dart';
+import 'package:southsea_cinema/widgets/primary_button.dart';
 
 class MovieListing extends StatefulWidget {
   const MovieListing({super.key});
@@ -121,13 +122,9 @@ class _MovieListingState extends State<MovieListing> {
             ),
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal,
-              foregroundColor: Colors.white,
-            ),
+          PrimaryButton(
+            label: 'Add To Order',
             onPressed: _increaseQuantity,
-            child: const Text('Add To Order'),
           ),
           const SizedBox(height: 16),
           if (_orderMessage.isNotEmpty)
