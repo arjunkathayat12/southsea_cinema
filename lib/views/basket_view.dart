@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:southsea_cinema/constants.dart';
 import 'package:southsea_cinema/widgets/nav_drawer.dart';
+import 'package:southsea_cinema/widgets/primary_button.dart';
 import 'package:southsea_cinema/repositories/basket_repository.dart';
 
 class BasketView extends StatefulWidget {
@@ -13,6 +14,8 @@ class BasketView extends StatefulWidget {
 class _BasketViewState extends State<BasketView> {
   final BasketRepository _basketRepository = BasketRepository.instance;
 
+  String _confirmationMessage = '';
+
   @override
   Widget build(BuildContext context) {
     final tickets = _basketRepository.getTickets();
@@ -23,10 +26,25 @@ class _BasketViewState extends State<BasketView> {
       ),
       drawer: const NavDrawer(),
       body: tickets.isEmpty
-          ? const Center(
-              child: Text(
-                'Your basket is empty.',
-                style: TextStyle(fontSize: 20),
+          ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Your basket is empty.',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  if (_confirmationMessage.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      _confirmationMessage,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             )
           : Column(
@@ -108,12 +126,27 @@ class _BasketViewState extends State<BasketView> {
                         onPressed: () {
                           setState(() {
                             _basketRepository.clear();
+                            _confirmationMessage = '';
                           });
                         },
                         icon: const Icon(Icons.delete),
                         label: const Text('Clear Basket'),
                         style: TextButton.styleFrom(
                           foregroundColor: cinemaBrand,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: PrimaryButton(
+                          label: 'Checkout',
+                          onPressed: () {
+                            setState(() {
+                              _basketRepository.clear();
+                              _confirmationMessage =
+                                  'Thanks, your order is on its way';
+                            });
+                          },
                         ),
                       ),
                     ],
