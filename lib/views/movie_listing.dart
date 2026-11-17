@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:southsea_cinema/constants.dart';
 import 'package:southsea_cinema/widgets/nav_drawer.dart';
 import 'package:southsea_cinema/widgets/primary_button.dart';
+import 'package:southsea_cinema/models/ticket_item.dart';
+import 'package:southsea_cinema/repositories/basket_repository.dart';
 
 class MovieListing extends StatefulWidget {
   const MovieListing({super.key});
@@ -16,13 +18,23 @@ class _MovieListingState extends State<MovieListing> {
   String _orderMessage = '';
 
   void _increaseQuantity() {
-    setState(() {
-      if (_ticketQuantity > 0) {
-        _orderMessage = '$_ticketQuantity tickets added to your order.';
-      } else {
+    if (_ticketQuantity > 0) {
+      final TicketItem ticket = TicketItem(
+        movieTitle: 'The Avengers (2012)',
+        quantity: _ticketQuantity,
+        ticketPrice: _ticketPrice,
+      );
+
+      BasketRepository.instance.addTicket(ticket);
+
+      setState(() {
+        _orderMessage = '$_ticketQuantity tickets added to your basket.';
+      });
+    } else {
+      setState(() {
         _orderMessage = 'Please select the number of tickets.';
-      }
-    });
+      });
+    }
   }
 
   @override
