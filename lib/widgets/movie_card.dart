@@ -63,11 +63,24 @@ class MovieCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    'Screening: ${movie.screeningTiming}',
-                    style: const TextStyle(
-                      color: cinemaFontMuted,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Screening: ${movie.screeningTiming}',
+                        style: const TextStyle(
+                          color: cinemaFontMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Ticket price: ${movie.formattedPrice}',
+                        style: const TextStyle(
+                          color: cinemaFontMuted,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 PrimaryButton(
