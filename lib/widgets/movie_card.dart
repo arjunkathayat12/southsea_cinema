@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:southsea_cinema/models/movie.dart';
 import 'package:southsea_cinema/constants.dart';
+import 'package:southsea_cinema/order_screen.dart';
 
 class MovieCard extends StatelessWidget {
   final Movie movie;
@@ -62,28 +63,40 @@ class MovieCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    'Screening: ${movie.screeningTiming}',
-                    style: const TextStyle(
-                      color: cinemaFontMuted,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Screening: ${movie.screeningTiming}',
+                        style: const TextStyle(
+                          color: cinemaFontMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Ticket price: ${movie.formattedPrice}',
+                        style: const TextStyle(
+                          color: cinemaFontMuted,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                ElevatedButton(
+                PrimaryButton(
+                  label: 'Book tickets',
                   onPressed: () {
-                    print(
-                      'Booking button pressed for ${movie.title}',
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return OrderScreen(movie: movie);
+                        },
+                      ),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: cinemaBrand,
-                    foregroundColor: cinemaFontWhite,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero,
-                    ),
-                  ),
-                  child: const Text('Book tickets'),
-                ),
+                  child: const Text('Order'),
+                )
               ],
             ),
           ],
