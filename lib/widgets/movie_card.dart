@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:southsea_cinema/models/movie.dart';
 import 'package:southsea_cinema/constants.dart';
-import 'package:southsea_cinema/order_screen.dart';
 
 class MovieCard extends StatelessWidget {
   final Movie movie;
@@ -83,20 +82,12 @@ class MovieCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                PrimaryButton(
-                  label: 'Book tickets',
+                ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return OrderScreen(movie: movie);
-                        },
-                      ),
-                    );
+                    print('Booking ${movie.title}');
                   },
-                  child: const Text('Order'),
-                )
+                  child: const Text('Book tickets'),
+                ),
               ],
             ),
           ],
