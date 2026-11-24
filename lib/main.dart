@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:southsea_cinema/constants.dart';
+import 'package:southsea_cinema/models/movie.dart';
 import 'package:southsea_cinema/views/home_view.dart';
 import 'package:southsea_cinema/views/movie_listing.dart';
 import 'package:southsea_cinema/views/basket_view.dart';
@@ -24,17 +25,15 @@ class SouthseaCinemaApp extends StatelessWidget {
           primary: cinemaBrand,
           surface: cinemaSurface,
         ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: cinemaSurface,
-          iconTheme: IconThemeData(color: cinemaBrand),
-          titleTextStyle: cinemaHeaderStyle,
-          elevation: 0,
-        ),
       ),
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeView(),
-        '/listing': (context) => const MovieListing(),
+        '/listing': (context) {
+          final movie = ModalRoute.of(context)!.settings.arguments as Movie;
+
+          return MovieListing(movie: movie);
+        },
         '/basket': (context) => const BasketView(),
         '/settings': (context) => const SettingsView(),
       },
