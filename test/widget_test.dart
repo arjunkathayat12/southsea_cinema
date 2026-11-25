@@ -1,132 +1,145 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:southsea_cinema/main.dart';
-import 'package:southsea_cinema/models/movie.dart';
-import 'package:southsea_cinema/repositories/movie_repository.dart';
 import 'package:southsea_cinema/repositories/basket_repository.dart';
 import 'package:southsea_cinema/views/movie_listing.dart';
 import 'package:southsea_cinema/widgets/movie_card.dart';
 
 void main() {
-  testWidgets('Basic app loading test', (WidgetTester tester) async {
-    await tester.pumpWidget(const SouthseaCinemaApp());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'JSON movie loading and complete booking flow',
+    (WidgetTester tester) async {
+      // Start with an empty basket.
+      BasketRepository.instance.clear();
+      addTearDown(() => BasketRepository.instance.clear());
 
-    expect(find.text('Welcome to Southsea Cinema'), findsOneWidget);
-    expect(find.text('Avengers Endgame'), findsOneWidget);
-    expect(find.text('Iron Man'), findsOneWidget);
-  });
+      // Open the actual application.
+      await tester.pumpWidget(const SouthseaCinemaApp());
 
-  testWidgets('Complete movie booking flow', (WidgetTester tester) async {
-    // Start with an empty basket.
-    BasketRepository.instance.clear();
-    addTearDown(() => BasketRepository.instance.clear());
+      // Wait for movies to load from the JSON asset.
+      await tester.pumpAndSettle();
 
-    // Get a movie from the movie repository.
-    final Movie selectedMovie = MovieRepository().getMovies().first;
+      // Check the home page.
+      expect(
+        find.text('Welcome to Southsea Cinema'),
+        findsOneWidget,
+      );
 
-    // Display the selected movie card.
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: ListView(
-            children: [
-              MovieCard(movie: selectedMovie),
-            ],
-          ),
+      expect(find.text('Avengers Endgame'), findsOneWidget);
+      expect(find.text('Iron Man'), findsOneWidget);
+      expect(find.byType(MovieCard), findsNWidgets(2));
+
+      // Find the first movie card.
+      final movieCard = find.byType(MovieCard).first;
+
+      // Get the selected movie details.
+      final selectedMovie = tester.widget<MovieCard>(movieCard).movie;
+
+      // Find BOOK NOW.
+      final bookNowButton = find.descendant(
+        of: movieCard,
+        matching: find.text('BOOK NOW'),
+      );
+
+      expect(bookNowButton, findsOneWidget);
+
+      // Tap BOOK NOW.
+      await tester.ensureVisible(bookNowButton);
+      await tester.tap(bookNowButton);
+      await tester.pumpAndSettle();
+
+      // Check that MovieListing opens.
+      final movieListing = find.byType(MovieListing);
+      expect(movieListing, findsOneWidget);
+
+      // Check selected movie details.
+      expect(
+        find.descendant(
+          of: movieListing,
+          matching: find.text(selectedMovie.title),
         ),
-      ),
-    );
+        findsOneWidget,
+      );
 
-    // Check that the movie card is displayed.
-    expect(find.byType(MovieCard), findsOneWidget);
+      expect(
+        find.descendant(
+          of: movieListing,
+          matching: find.text(selectedMovie.synopsis),
+        ),
+        findsOneWidget,
+      );
 
-    // Find BOOK NOW button.
-    final bookNowButton = find.text('BOOK NOW');
+      expect(
+        find.text('Age rating: ${selectedMovie.ageRating}'),
+        findsOneWidget,
+      );
 
-    expect(bookNowButton, findsOneWidget);
+      expect(
+        find.text('Screening: ${selectedMovie.screeningTiming}'),
+        findsOneWidget,
+      );
 
-    // Tap BOOK NOW.
-    await tester.ensureVisible(bookNowButton);
-    await tester.tap(bookNowButton);
-    await tester.pumpAndSettle();
+      // Find Add To Order.
+      final addButton = find.descendant(
+        of: movieListing,
+        matching: find.text('Add To Order'),
+      );
 
-    // Check that MovieListing opens.
-    expect(find.byType(MovieListing), findsOneWidget);
+      expect(addButton, findsOneWidget);
 
-    // Check the selected movie details.
-    expect(find.text(selectedMovie.title), findsOneWidget);
+      // Tap without selecting tickets.
+      await tester.ensureVisible(addButton);
+      await tester.tap(addButton);
+      await tester.pump();
 
-    expect(find.text(selectedMovie.synopsis), findsOneWidget);
+      // Check warning feedback.
+      expect(
+        find.text('Please select the number of tickets.'),
+        findsOneWidget,
+      );
 
-    expect(
-      find.text('Age rating: ${selectedMovie.ageRating}'),
-      findsOneWidget,
-    );
+      // Open ticket dropdown.
+      await tester.tap(find.byType(DropdownMenu<int>));
+      await tester.pumpAndSettle();
 
-    expect(
-      find.text('Screening: ${selectedMovie.screeningTiming}'),
-      findsOneWidget,
-    );
+      // Select one ticket.
+      await tester.tap(find.text('1').last);
+      await tester.pumpAndSettle();
 
-    // Find Add To Order button.
-    final addButton = find.text('Add To Order');
+      // Add the selected ticket.
+      await tester.ensureVisible(addButton);
+      await tester.tap(addButton);
+      await tester.pump();
 
-    expect(addButton, findsOneWidget);
+      // Check successful feedback.
+      expect(
+        find.text('1 tickets added to your order.'),
+        findsOneWidget,
+      );
 
-    // Tap without selecting tickets.
-    await tester.ensureVisible(addButton);
-    await tester.tap(addButton);
-    await tester.pump();
+      // Check updated total.
+      expect(
+        find.text(
+          'Total: £${selectedMovie.ticketPrice.toStringAsFixed(2)}',
+        ),
+        findsOneWidget,
+      );
 
-    // Check warning feedback.
-    expect(
-      find.text('Please select the number of tickets.'),
-      findsOneWidget,
-    );
+      // Check basket repository contents.
+      expect(
+        BasketRepository.instance.getTotalTickets(),
+        1,
+      );
 
-    // Open the ticket dropdown.
-    await tester.tap(find.byType(DropdownMenu<int>));
-    await tester.pumpAndSettle();
+      expect(
+        BasketRepository.instance.getTotal(),
+        selectedMovie.ticketPrice,
+      );
 
-    // Select one ticket.
-    await tester.tap(find.text('1').last);
-    await tester.pumpAndSettle();
-
-    // Tap Add To Order again.
-    await tester.ensureVisible(addButton);
-    await tester.tap(addButton);
-    await tester.pump();
-
-    // Check successful feedback.
-    expect(
-      find.text('1 tickets added to your order.'),
-      findsOneWidget,
-    );
-
-    // Check updated total using the selected movie's actual price.
-    expect(
-      find.text(
-        'Total: £${selectedMovie.ticketPrice.toStringAsFixed(2)}',
-      ),
-      findsOneWidget,
-    );
-
-    // Check that the ticket was saved in BasketRepository.
-    expect(
-      BasketRepository.instance.getTotalTickets(),
-      1,
-    );
-
-    expect(
-      BasketRepository.instance.getTotal(),
-      selectedMovie.ticketPrice,
-    );
-
-    // Check the correct movie was saved.
-    expect(
-      BasketRepository.instance.getTickets().first.movieTitle,
-      selectedMovie.title,
-    );
-  });
+      expect(
+        BasketRepository.instance.getTickets().first.movieTitle,
+        selectedMovie.title,
+      );
+    },
+  );
 }
